@@ -357,7 +357,8 @@ def setup_render_node(render_engine="opengl", karma_engine="cpu", render_path=No
     try:
         # Set default render path if not specified
         if not render_path:
-            render_path = "C:/temp/"
+            import tempfile
+            render_path = os.path.join(tempfile.gettempdir(), "houdini_mcp") + os.sep
         
         # Ensure directory exists
         if not os.path.exists(render_path):
@@ -488,7 +489,7 @@ def setup_render_node(render_engine="opengl", karma_engine="cpu", render_path=No
 
 # ======== RENDERING FUNCTIONS ========
 
-def render_single_view(orthographic=False, rotation=(0, 90, 0), render_path=None, render_engine="opengl", karma_engine="cpu"):
+def render_single_view(orthographic=False, rotation=(0, 90, 0), render_path=None, render_engine="karma", karma_engine="gpu"):
     """
     Set up camera rig and render a single view with specified rotation.
     
@@ -560,7 +561,7 @@ def render_single_view(orthographic=False, rotation=(0, 90, 0), render_path=None
     print(f"Rendered frame to: {filepath}")
     return filepath
 
-def render_quad_view(orthographic=True, render_path=None, render_engine="opengl", karma_engine="cpu"):
+def render_quad_view(orthographic=True, render_path=None, render_engine="karma", karma_engine="gpu"):
     """
     Create four standard views and render them:
     - Front view (0,0,0)
@@ -659,7 +660,7 @@ def render_quad_view(orthographic=True, render_path=None, render_engine="opengl"
     
     return rendered_files
 
-def render_specific_camera(camera_path, render_path=None, render_engine="opengl", karma_engine="cpu"):
+def render_specific_camera(camera_path, render_path=None, render_engine="karma", karma_engine="gpu"):
     """
     Render using a specific camera that already exists in the scene.
     

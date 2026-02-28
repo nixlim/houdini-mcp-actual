@@ -533,7 +533,7 @@ def get_houdini_connection() -> HoudiniConnection:
 # Now define the MCP server that Claude will talk to over stdio
 mcp = FastMCP(
     "HoudiniMCP",
-    description="A bridging server that connects Claude to Houdini via MCP stdio + TCP, with OPUS API integration."
+    instructions="A bridging server that connects Claude to Houdini via MCP stdio + TCP, with OPUS API integration."
 )
 
 @asynccontextmanager
@@ -650,11 +650,12 @@ def execute_houdini_code(ctx: Context, code: str) -> str:
 def render_single_view(ctx: Context,
                        orthographic: bool = False,
                        rotation: List[float] = [0, 90, 0],
-                       render_path: str = "C:/temp/",
-                       render_engine: str = "opengl",
-                       karma_engine: str = "cpu") -> str:
+                       render_path: str = "",
+                       render_engine: str = "karma",
+                       karma_engine: str = "gpu") -> str:
     """
     Render a single view inside Houdini and return the rendered image path.
+    render_engine can be 'karma', 'mantra', or 'opengl' (opengl requires GPU OpenGL 3.3).
     """
     try:
         conn = get_houdini_connection()
@@ -677,11 +678,12 @@ def render_single_view(ctx: Context,
 
 @mcp.tool()
 def render_quad_views(ctx: Context,
-                      render_path: str = "C:/temp/",
-                      render_engine: str = "opengl",
-                      karma_engine: str = "cpu") -> str:
+                      render_path: str = "",
+                      render_engine: str = "karma",
+                      karma_engine: str = "gpu") -> str:
     """
     Render 4 canonical views from Houdini and return the image paths.
+    render_engine can be 'karma', 'mantra', or 'opengl' (opengl requires GPU OpenGL 3.3).
     """
     try:
         conn = get_houdini_connection()
@@ -703,11 +705,12 @@ def render_quad_views(ctx: Context,
 @mcp.tool()
 def render_specific_camera(ctx: Context,
                            camera_path: str,
-                           render_path: str = "C:/temp/",
-                           render_engine: str = "opengl",
-                           karma_engine: str = "cpu") -> str:
+                           render_path: str = "",
+                           render_engine: str = "karma",
+                           karma_engine: str = "gpu") -> str:
     """
     Render from a specific camera path in the Houdini scene.
+    render_engine can be 'karma', 'mantra', or 'opengl' (opengl requires GPU OpenGL 3.3).
     """
     try:
         conn = get_houdini_connection()
@@ -889,14 +892,14 @@ def get_opus_job_result(batch_job_id: str) -> dict:
 
 def main():
     """Run the MCP server on stdio."""
-    # Check necessary RapidAPI variables are set before running
+    # Check RapidAPI variables — warn but don't block startup (OPUS is optional)
     if not RAPIDAPI_HOST_URL or not RAPIDAPI_HOST or not RAPIDAPI_KEY:
-         logger.critical("RAPIDAPI_HOST_URL, RAPIDAPI_HOST, and RAPIDAPI_KEY environment variables are not set. Please configure urls.env.")
-         logger.critical("Server will not start.")
-         sys.exit(1) # Exit if critical configuration is missing
-         
-    logger.info(f"Using RapidAPI Host URL: {RAPIDAPI_HOST_URL}")
-    logger.info(f"Using RapidAPI Host Header: {RAPIDAPI_HOST}")
+         logger.warning("RAPIDAPI_HOST_URL, RAPIDAPI_HOST, and/or RAPIDAPI_KEY are not set in urls.env.")
+         logger.warning("OPUS API tools will be unavailable. Core Houdini MCP tools will still work.")
+    else:
+        logger.info(f"Using RapidAPI Host URL: {RAPIDAPI_HOST_URL}")
+        logger.info(f"Using RapidAPI Host Header: {RAPIDAPI_HOST}")
+
     logger.info(f"Langchain available: {LANGCHAIN_AVAILABLE}")
     mcp.run()
 
