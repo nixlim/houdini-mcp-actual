@@ -9,7 +9,10 @@ import traceback
 import os
 import shutil
 import sys
-from PySide2 import QtWidgets, QtCore
+try:
+    from PySide6 import QtWidgets, QtCore
+except ImportError:
+    from PySide2 import QtWidgets, QtCore
 import io
 from contextlib import redirect_stdout, redirect_stderr
 import base64 # Added for encoding

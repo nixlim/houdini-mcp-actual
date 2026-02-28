@@ -1,0 +1,10 @@
+{
+  "path": "$HOME/Library/Preferences/houdini/21.0/scripts/python/houdinimcp",
+  "load_package_once": true,
+  "version": "0.1",
+  "env": [
+    {
+      "PYTHONPATH": "$PYTHONPATH:$HOME/Library/Preferences/houdini/21.0/scripts/python"
+    }
+  ]
+}
